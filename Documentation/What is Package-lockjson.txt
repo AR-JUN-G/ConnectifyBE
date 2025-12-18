@@ -1,0 +1,41 @@
+NodeModules is a folder where when we install any library or framework. The code of the Library/
+framework will be stored in the NodeModules and all the dependencies of that library or framework
+will also be downloaded and put inside the NodeModules.
+
+What is .bin File inside NodeModules?
+    .bin contains executable wrappers for packages that expose CLI commands.
+    Instead of typing the entire path of the package we can simply configure name of the package
+
+    If we need to run eslint instead of 
+        node node_modules/eslint/bin/eslint.js
+    We can use  
+        eslint
+    Because .bin acts as a shortcut.
+
+
+version in Packages?
+    example ^5.2.1 or ~5.2.1? 
+    1->patch(Small Bug Fix. Increase the value of patch version when we are pushing minor bug fix)
+    2->Minor(Releasing a New Feature. We need to increase the Minor Version number. Here the version are backward compatible.
+    backward compatible means lets assume new version got released 5.5.10. We can safely upgrade to version
+    5.5.10 Because increase in Minor versions are backward compatible)
+    5->Major(Increase the Major version when there are breaking changes. But express release new major version changes
+    6.5.10 if we upgrade to 6.5.10 from 5.2.1 then there will be breaking changes.)
+
+    ^ in front of version-> example ^5.2.1 -> Our application will automatically will get upgraded
+    when any 5.x.x version comes
+    ~ in front of version-> example ~5.2.1 -> Our application will automatically will get upgraded
+    if any patch version comes when 5.2.x (More stable)
+
+    If we give 5.2.1 -> stays in this version until we manually upgrade
+
+What is Package-Lock.json?
+
+    Package-Lock will give in which actual version our packages are running on.
+    Package.json will provide whether it is auto upgrade for major version(^) or auto upgrade for 
+    minor version(^) or manual upgrade.
+
+
+    Only package-lock will let you actual know in which version the current package is actually running
+
+
