@@ -1,0 +1,5 @@
+How to use Protobuf?
+	1. In order to use protobuf we need to create a schema file with type and order in which the key of the element comes 
+	2. Using proto.exe we need to generate out desired language proto file	
+	3. After we can use some of the methods in the generated proto file and we can use it to serialize and deserialize data
+	4. I need both generated proto file both in frontend and backend

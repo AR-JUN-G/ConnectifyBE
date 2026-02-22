@@ -39,3 +39,13 @@ What is Package-Lock.json?
     Only package-lock will let you actual know in which version the current package is actually running
 
 
+
+Do we need to push package-lock.json to git?
+    Yes we need to push the package-lock.json to git. Bcoz package-lock.json locks the dependency
+    tree versions which helps in reliable across various environment or machines. dev, stage and 
+    production. If we fail to push different machine will be running different version of package
+    (if there are any patch changes made. So there can be scenerios like it works in my system
+    but not in other). In order to avoid this kind of issue we need to push package-lock
+
+    The file can contain hashes of package contents, which can be used to verify the integrity 
+    of installed packages. It is also used by tools for security audits. 

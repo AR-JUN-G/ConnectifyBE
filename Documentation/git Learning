@@ -1,0 +1,18 @@
+git init:   Initialize a new, empty Git Repo or to reinitialize an Exisiting one
+
+git remote add origin -> The command git remote add origin <URL> is used to connect a local Git repo
+                         to a remote server for the first time. It creates a "bookmark" or 
+                         shorthand alias named origin that points to the remote repository's 
+                         full web address.
+                         It can be verified by typing git -v command
+
+git push -u origin dev -> what does -u?
+                            Does 2 thing:
+                                Publish the branch(Git repo)
+                                Making the dev branch as upstream branch(In future if i give
+                                git pull or git push my changes will be pushed or pulled from dev branch
+                                its like a shortcut instead of entirely typing git pull origin dev
+                                I can do this. If i need to make other branch as upstream branch 
+                                I need to reconfigure that git pull -u origin feature1)
+
+git branch -vv:  You can check which upstream is currently set for all your branches by running
