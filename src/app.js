@@ -40,33 +40,40 @@ app.get("/api/feed", async (req, res) => {
 });
 
 app.patch("/api/updateuser/:userid", async (req, res) => {
-  const userId = req.params?.userid;
-  const data = req.body;
+  try {
+    const userId = req.params?.userid;
+    const data = req.body;
 
-  const immutableFields = ["emailId", "createdAt", "updatedAt"];
-  const containImmutableFields = Object.keys(data).some((key) => {
-    return immutableFields.includes(key);
-  });
+    const immutableFields = ["emailId", "createdAt", "updatedAt"];
+    const containImmutableFields = Object.keys(data).some((key) => {
+      return immutableFields.includes(key);
+    });
 
-  if (containImmutableFields) {
-    return res
-      .status(400)
-      .send("Update failed: You cannot modify protected fields like emailId.");
+    if (containImmutableFields) {
+      return res
+        .status(400)
+        .send(
+          "Update failed: You cannot modify protected fields like emailId.",
+        );
+    }
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: data },
+      { returnDocument: "after" },
+    );
+
+    if (!updatedUser) {
+      return res.status(404).send("User not found");
+    }
+
+    res.status(200).json({
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send("Something went wrong");
   }
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    { $set: data },
-    { returnDocument: "after" },
-  );
-
-  if (!updatedUser) {
-    return res.status(404).send("User not found");
-  }
-
-  res.status(200).json({
-    message: "User updated successfully",
-    data: updatedUser,
-  });
 });
 
 app.delete("/api/deleteuser", async (req, res) => {
