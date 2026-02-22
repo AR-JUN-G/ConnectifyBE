@@ -2,32 +2,100 @@ const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
+const { validateSignupData, validateLoginData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
 app.post("/api/signup", async (req, res) => {
   try {
-    const body = req.body;
-    await User.create(body);
-    res.status(201).send("User Created");
+    const { firstName, lastName, emailId, password } = req.body;
+    const validation = validateSignupData(req.body);
+
+    if (!validation.isValid) {
+      console.log("Inside");
+      return res.status(400).json({ errors: validation.errors });
+    }
+
+    const saltRound = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRound);
+
+    console.log(hashedPassword);
+    const newUser = await User.create({
+      firstName,
+      lastName,
+      emailId,
+      password: hashedPassword,
+    });
+    res.status(201).json({
+      message: "User Created Successfully",
+      user: {
+        id: newUser._id,
+        firstName: newUser.firstName,
+        emailId: newUser.emailId,
+      },
+    });
   } catch (e) {
+    console.error("Signup Error:", e);
     let errors = {};
-    console.log(e);
 
     if (e.name == "ValidationError") {
       Object.keys(e.errors).forEach((key) => {
         errors[key] = e.errors[key].message;
       });
-      res.status(400).send(errors);
-    } else if (e.code == 11000) {
+      return res.status(400).json({ errors });
+    }
+    if (e.code == 11000) {
       const field = Object.keys(e.keyValue)[0];
       const message = `Duplicate Field Value entered for '${field}'.Please enter new value`;
       errors[field] = message;
-      res.status(409).send(errors);
-    } else {
-      res.status(500).send("Something went wrong");
+      return res.status(409).json({ errors });
+    }
+
+    res
+      .status(400)
+      .json({ message: "An Unexpected Internal Server error Occured" });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try{
+    const {emailId,password}=req.body;
+    const DUMMY_HASH = "$2b$10$3euPcmQFCiblsZeEu5s7p.9OVH028YwR/9HnE3.d7j4q7.2aJ./uG";
+    const validation=validateLoginData(req.body);
+  
+    if(!validation.isValid){
+      return res.status(401).json({
+        "message":"User not found"});
+    }
+
+    const getUser=await User.findOne({emailId});
+    
+    if(getUser){
+      const hashedPassword=getUser.password;
+      const isPasswordMatch=await bcrypt.compare(password, hashedPassword);
+      if(!isPasswordMatch){
+        return res.status(401).json({"message":"Invalid UserID or Password"});
+      }
+      return res.status(200).json({
+        "message":"User Logged in Successfully"
+      })
+    }
+    else{
+      await bcrypt.compare(password, DUMMY_HASH);
+      return res.status(401).json({
+        "message":"Invalid UserID or Password"
+      })
     }
   }
+  catch(e){
+    console.error("Login Error",e);
+    res.send(500).json({
+      "message":"Something went wrong"
+    })
+  }
+
+
 });
 
 app.get("/api/feed", async (req, res) => {
