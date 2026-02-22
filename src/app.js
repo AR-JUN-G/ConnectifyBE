@@ -12,17 +12,21 @@ app.post("/api/signup", async (req, res) => {
     res.status(201).send("User Created");
   } catch (e) {
     let errors = {};
+    console.log(e);
+
     if (e.name == "ValidationError") {
       Object.keys(e.errors).forEach((key) => {
         errors[key] = e.errors[key].message;
       });
+      res.status(400).send(errors);
     } else if (e.code == 11000) {
       const field = Object.keys(e.keyValue)[0];
       const message = `Duplicate Field Value entered for '${field}'.Please enter new value`;
       errors[field] = message;
+      res.status(409).send(errors);
+    } else {
+      res.status(500).send("Something went wrong");
     }
-    console.log(e);
-    res.status(409).send(errors);
   }
 });
 
@@ -38,8 +42,17 @@ app.get("/api/feed", async (req, res) => {
 app.patch("/api/updateuser/:userid", async (req, res) => {
   const userId = req.params?.userid;
   const data = req.body;
-  console.log(data);
 
+  const immutableFields = ["emailId", "createdAt", "updatedAt"];
+  const containImmutableFields = Object.keys(data).some((key) => {
+    return immutableFields.includes(key);
+  });
+
+  if (containImmutableFields) {
+    return res
+      .status(400)
+      .send("Update failed: You cannot modify protected fields like emailId.");
+  }
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { $set: data },

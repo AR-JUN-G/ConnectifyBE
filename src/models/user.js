@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const thirdPartyValidator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,10 +18,24 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
+      validate: {
+        validator: (value) => {
+          if (!thirdPartyValidator.isEmail(value)) {
+            throw new Error("Invalid Email Address");
+          }
+        },
+      },
     },
     password: {
       type: String,
       required: true,
+      validate: {
+        validator: (value) => {
+          if (!thirdPartyValidator.isStrongPassword(value)) {
+            throw new Error("Enter a Strong Password");
+          }
+        },
+      },
     },
     age: {
       type: Number,
@@ -31,7 +46,7 @@ const userSchema = new mongoose.Schema(
       validate: {
         validator: (value) => {
           console.log(value);
-          if (!["male","female","others"].includes(value)) {
+          if (!["male", "female", "others"].includes(value)) {
             throw new Error("Invalid Gender");
           }
         },
@@ -41,14 +56,21 @@ const userSchema = new mongoose.Schema(
       type: String,
       default:
         "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+      validate: {
+        validator: (value) => {
+          if (!thirdPartyValidator.isURL(value)) {
+            throw new Error("The request url is wrong");
+          }
+        },
+      },
     },
     about: {
       type: String,
       default: "Hello there i am using Developer Hub",
     },
-    skills:{
-      type:[String]
-    }
+    skills: {
+      type: [String],
+    },
   },
   {
     timestamps: true,
