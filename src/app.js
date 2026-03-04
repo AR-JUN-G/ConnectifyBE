@@ -4,8 +4,12 @@ const app = express();
 const User = require("./models/user");
 const { validateSignupData, validateLoginData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+const auth = require("./middleware/auth");
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/api/signup", async (req, res) => {
   try {
@@ -13,7 +17,6 @@ app.post("/api/signup", async (req, res) => {
     const validation = validateSignupData(req.body);
 
     if (!validation.isValid) {
-      console.log("Inside");
       return res.status(400).json({ errors: validation.errors });
     }
 
@@ -59,55 +62,68 @@ app.post("/api/signup", async (req, res) => {
 });
 
 app.post("/api/login", async (req, res) => {
-  try{
-    const {emailId,password}=req.body;
-    const DUMMY_HASH = "$2b$10$3euPcmQFCiblsZeEu5s7p.9OVH028YwR/9HnE3.d7j4q7.2aJ./uG";
-    const validation=validateLoginData(req.body);
-  
-    if(!validation.isValid){
+  try {
+    const { emailId, password } = req.body;
+    const DUMMY_HASH =
+      "$2b$10$3euPcmQFCiblsZeEu5s7p.9OVH028YwR/9HnE3.d7j4q7.2aJ./uG";
+    const validation = validateLoginData(req.body);
+
+    if (!validation.isValid) {
       return res.status(401).json({
-        "message":"User not found"});
+        message: "User not found",
+      });
     }
 
-    const getUser=await User.findOne({emailId});
-    
-    if(getUser){
-      const hashedPassword=getUser.password;
-      const isPasswordMatch=await bcrypt.compare(password, hashedPassword);
-      if(!isPasswordMatch){
-        return res.status(401).json({"message":"Invalid UserID or Password"});
+    const getUser = await User.findOne({ emailId });
+
+    if (getUser) {
+      const hashedPassword = getUser.password;
+      const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
+      if (!isPasswordMatch) {
+        return res.status(401).json({ message: "Invalid UserID or Password" });
       }
+
+      const token = jwt.sign(
+        {
+          userId: getUser._id,
+        },
+        "secret",
+        { expiresIn: 3600000 },
+      );
+
+      res.cookie("token", token, { httpOnly: true });
+
       return res.status(200).json({
-        "message":"User Logged in Successfully"
-      })
-    }
-    else{
+        message: "User Logged in Successfully",
+      });
+    } else {
       await bcrypt.compare(password, DUMMY_HASH);
       return res.status(401).json({
-        "message":"Invalid UserID or Password"
-      })
+        message: "Invalid UserID or Password",
+      });
     }
-  }
-  catch(e){
-    console.error("Login Error",e);
+  } catch (e) {
+    console.error("Login Error", e);
     res.send(500).json({
-      "message":"Something went wrong"
-    })
+      message: "Something went wrong",
+    });
   }
-
-
 });
 
-app.get("/api/feed", async (req, res) => {
+app.get("/api/feed", auth, async (req, res) => {
   try {
-    const data = await User.find({});
-    res.status(200).json(data);
+    const feedData = await User.find({}).select("-password -emailId");
+    res.status(200).json({
+      message: "Feed fetched successfully",
+      currentUser: req.user.firstName,
+      data: feedData,
+    });
   } catch (e) {
     res.status(500).send("Something went wrong");
   }
 });
 
-app.patch("/api/updateuser/:userid", async (req, res) => {
+app.patch("/api/updateuser/:userid", auth, async (req, res) => {
   try {
     const userId = req.params?.userid;
     const data = req.body;
