@@ -3,7 +3,7 @@ const feedRouter = express.Router();
 const User = require("../models/user");
 const auth = require("../middleware/auth");
 
-feedRouter.get("/api/feed", auth, async (req, res) => {
+feedRouter.get("/api/sendRequest", auth, async (req, res) => {
   try {
     const feedData = await User.find({}).select("-password -emailId");
     res.status(200).json({
