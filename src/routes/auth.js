@@ -17,7 +17,6 @@ authRouter.post("/api/signup", async (req, res) => {
     const saltRound = 10;
     const hashedPassword = await bcrypt.hash(password, saltRound);
 
-    console.log(hashedPassword);
     const newUser = await User.create({
       firstName,
       lastName,
@@ -104,5 +103,9 @@ authRouter.post("/api/login", async (req, res) => {
   }
 });
 
-
+authRouter.post("/api/logout",async(req,res)=>{
+  res.cookie("token",null,{expires: new Date(Date.now())})
+  .status(200).
+  json({"message":"User logged Out Successfully"});
+})
 module.exports=authRouter;
