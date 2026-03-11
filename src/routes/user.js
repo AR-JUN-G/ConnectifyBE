@@ -68,6 +68,16 @@ userRouter.get("/api/feed", auth, async (req, res) => {
 
   try {
     const userId = req.user._id;
+    // How many Data i need to skip
+    let limit = parseInt(req.query.limit)||10;
+    let page=parseInt(req.query.page)||1;
+
+    if (limit > 50 || limit == 0) {
+      limit = 50;
+     
+    }
+
+    let skip = (page-1)*limit;
 
     // The above request contains entire
     const connections = await ConnectionRequest.find({
@@ -84,7 +94,10 @@ userRouter.get("/api/feed", auth, async (req, res) => {
 
     const feedUsers = await User.find({
       _id: { $nin: Array.from(hiddenUsers) },
-    }).select("-password -createdAt -updatedAt -__v");
+    })
+      .select("-password -createdAt -updatedAt -__v")
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({
       message: "User List",
