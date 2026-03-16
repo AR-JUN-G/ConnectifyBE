@@ -81,7 +81,7 @@ authRouter.post("/api/login", async (req, res) => {
           userId: getUser._id,
         },
         "secret",
-        { expiresIn: 3600000 },
+        { expiresIn: "3d" },
       );
 
       res.cookie("token", token, { httpOnly: true });

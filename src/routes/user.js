@@ -3,6 +3,8 @@ const userRouter = express.Router();
 const auth = require("../middleware/auth");
 const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
+
+
 userRouter.get("/api/users/request/received", auth, async (req, res) => {
   try {
     const userID = req.user._id;
