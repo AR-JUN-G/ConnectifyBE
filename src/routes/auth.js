@@ -1,6 +1,9 @@
-const express=require('express');
-const authRouter=express.Router();
-const { validateSignupData, validateLoginData } = require("../utils/validation");
+const express = require("express");
+const authRouter = express.Router();
+const {
+  validateSignupData,
+  validateLoginData,
+} = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
@@ -88,6 +91,10 @@ authRouter.post("/api/login", async (req, res) => {
 
       return res.status(200).json({
         message: "User Logged in Successfully",
+        userID: getUser._id,
+        name: getUser.firstName,
+        email: getUser.emailId,
+        photourl: getUser.photourl,
       });
     } else {
       await bcrypt.compare(password, DUMMY_HASH);
@@ -103,9 +110,10 @@ authRouter.post("/api/login", async (req, res) => {
   }
 });
 
-authRouter.post("/api/logout",async(req,res)=>{
-  res.cookie("token",null,{expires: new Date(Date.now())})
-  .status(200).
-  json({"message":"User logged Out Successfully"});
-})
-module.exports=authRouter;
+authRouter.post("/api/logout", async (req, res) => {
+  res
+    .cookie("token", null, { expires: new Date(Date.now()) })
+    .status(200)
+    .json({ message: "User logged Out Successfully" });
+});
+module.exports = authRouter;
