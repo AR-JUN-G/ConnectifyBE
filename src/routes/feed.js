@@ -60,8 +60,8 @@ feedRouter.post("/api/send/:status/:userID", auth, async (req, res) => {
       message: `${status === "interested" ? "Request send to" : "Ignored"}  ${isReceiverExists.firstName}`,
       data: requestUpdate,
     });
-  } catch (e) {
-    console.error("Error while sending the request", e);
+  } catch (error) {
+    console.error("Error while sending the request", error);
     res.status(500).json({
       message: "Something went wrong",
     });
@@ -71,7 +71,7 @@ feedRouter.post("/api/send/:status/:userID", auth, async (req, res) => {
 feedRouter.post("/api/review/:status/:requestID", auth, async (req, res) => {
   try {
     const { status, requestID } = req.params;
-    const receiverID = req.user._id;  
+    const receiverID = req.user._id;
     const validStatus = ["accepted", "rejected"];
 
     if (!validStatus.includes(status)) {
@@ -85,7 +85,7 @@ feedRouter.post("/api/review/:status/:requestID", auth, async (req, res) => {
       status: "interested",
       toUserID: receiverID,
     });
-   
+
     if (!connectionRequest) {
       return res.status(400).send({
         message: "Request not found or invalid status",
@@ -100,8 +100,11 @@ feedRouter.post("/api/review/:status/:requestID", auth, async (req, res) => {
       message: `User requested ${status} successfully`,
       data,
     });
-  } catch (e) {
-    console.error("Error while reviewing the Request", e);
+  } catch (error) {
+    console.error("Error while reviewing the Request", error);
+    res.status(500).json({
+      message: "Error while reviewing the Request",
+    });
   }
 });
 

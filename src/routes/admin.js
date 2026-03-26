@@ -9,9 +9,11 @@ adminRouter.get("/api/getallusers", async (req, res) => {
         message:"User data fetched Successfully",
         data:userList
     })
-  } catch (e) {
+  } catch (error) {
     console.log("Error occured while fetching the User data", e);
-    res.status(500).status("Something went wrong");
+    res.status(500).json({
+      message:"Something went wrong"
+    });
   }
 });
 

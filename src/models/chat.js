@@ -6,17 +6,20 @@ const chatSchema = new Mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    chatName: {
+    chatID: {
       type: String,
       trim: true,
     },
-    participants: {
-      type: Mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    participants: [
+      {
+        type: Mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true,
+      },
+    ],
     // For showing the Latest message in sidebar
-    latestMessages: {
+    latestMessage: {
       type: Mongoose.Schema.Types.ObjectId,
       ref: "Message",
     },
@@ -34,3 +37,12 @@ const chatSchema = new Mongoose.Schema(
 const ChatModel = Mongoose.model("Chat", chatSchema);
 
 module.exports = ChatModel;
+
+/*
+  isGroupChat -> helps to classify group and individual chats
+  chatName -> we can keep them as roomName
+  participants -> For Group chat many people  
+               -> For direct chat only 2 People
+  latestMessage -> Stored for showing the UI
+
+*/

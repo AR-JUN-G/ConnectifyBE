@@ -7,25 +7,29 @@ const feedRouter = require("./routes/feed");
 const profileRouter = require("./routes/profile");
 const adminRouter = require("./routes/admin");
 const userRouter = require("./routes/user");
-const cors=require("cors");
-const { createServer } = require('http');
+const cors = require("cors");
+const { createServer } = require("http");
 const initializeSocket = require("./utils/socketConnection");
+const chatRouter = require("./routes/chat");
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin:'http://localhost:1234',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "http://localhost:1234",
+    credentials: true,
+  }),
+);
 
 app.use("/", authRouter);
 app.use("/", feedRouter);
 app.use("/", profileRouter);
 app.use("/", adminRouter);
-app.use("/",userRouter);
+app.use("/", userRouter);
+app.use("/", chatRouter);
 
-const server=createServer(app);
-// initializeSocket(server);
+const server = createServer(app);
+initializeSocket(server);
 
 connectDB()
   .then(() => {

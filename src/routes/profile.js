@@ -31,28 +31,28 @@ profileRouter.patch("/api/profile", auth, async (req, res) => {
         );
     }
 
-    if(data.password){
-      const saltRound=10;
-      data.password=await bcrypt.hash(data.password,saltRound);
+    if (data.password) {
+      const saltRound = 10;
+      data.password = await bcrypt.hash(data.password, saltRound);
     }
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: data },
-      { returnDocument: "after",
-        runValidators: true
-      },
+      { returnDocument: "after", runValidators: true },
     ).select("-password");
 
     if (!updatedUser) {
       return res.status(404).send("User not found");
-    }  
+    }
     res.status(200).json({
       message: "User updated successfully",
       data: updatedUser,
     });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send("Something went wrong");
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Something went wrong",
+    });
   }
 });
 

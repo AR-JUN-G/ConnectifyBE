@@ -20,8 +20,8 @@ userRouter.get("/api/users/request/received", auth, async (req, res) => {
       message: "Data fetched Successfully",
       data: requestList,
     });
-  } catch (e) {
-    console.log(e, "Error Occured while fetching the Connection request");
+  } catch (error) {
+    console.log(error, "Error Occured while fetching the Connection request");
     res.status(500).json({
       message: "Error occured while fetching the Data",
     });
@@ -105,8 +105,8 @@ userRouter.get("/api/feed", auth, async (req, res) => {
       message: "User List",
       data: feedUsers,
     });
-  } catch (e) {
-    console.error(e, "Error Occured in feed");
+  } catch (error) {
+    console.error(error, "Error Occured in feed");
     res.status(500).json({
       message: "Error occured while fetching the Data",
     });
