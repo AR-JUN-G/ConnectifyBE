@@ -12,27 +12,28 @@ chatRouter.get("/api/direct/chats", auth, async (req, res) => {
 
     const chatList = await Chat.find({ participants: userID })
       .populate("participants", "_id firstName lastName photourl")
-      .populate("latestMessage")
+      .populate("latestMessage","message createdAt")
       .sort({ updatedAt: -1 })
-      .select("participants latestMessages");
+      .select("participants latestMessage updatedAt");
 
-    let chatMembers=chatList.map((chat)=>{
+    console.log(chatList);
+    let chatMembers = chatList.map((chat) => {
+      let otherUser = chat.participants.find(
+        (participant) => participant._id.toString() !== userID.toString(),
+      );
 
-       let otherUser=chat.participants.find((participant)=>{
-        participant._id!==userID
-       });
-
-       return {
-         userID:otherUser?._id,
-         firstName:otherUser?.firstName,
-         lastName:otherUser?.lastName,
-         photourl:otherUser?.photourl,
-         latestMessage:otherUser?.latestMessage
-       }
-    })
+      return {
+        userID:otherUser?._id,
+        firstName:otherUser?.firstName,
+        lastName:otherUser?.lastName,
+        photourl:otherUser?.photourl,
+        latestMessage:chat?.latestMessage?.message || "",
+        time: chat?.latestMessage?.createdAt || chat?.updatedAt
+      };
+    });
     res.status(200).json({
       message: "Chat list fetched successfully",
-      data: chatList,
+      chats: chatMembers,
     });
   } catch (error) {
     console.error(error, "Something went wrong");
@@ -95,12 +96,13 @@ chatRouter.get(
   },
 );
 
-chatRouter.get("/api/direct/:roomID", auth, async (req, res) => {
+chatRouter.get("/api/direct/:receiverID", auth, async (req, res) => {
   try {
     let limit = parseInt(req.query.limit) || 10;
     let page = parseInt(req.query.page) || 1;
-    let roomID = req.params.roomID;
-
+    let receiverID = req.params.receiverID;
+    let roomID=[req.user._id.toString(),receiverID.toString()].sort().join('_');
+    
     if (limit > 50 || limit == 0) {
       limit = 50;
     }

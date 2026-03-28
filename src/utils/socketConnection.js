@@ -11,9 +11,9 @@ const initializeSocket = (server) => {
 
   io.on("connection", (socket) => {
     /// Help user to join chat with other user in direct chat
-    socket.on("joinChat", ({ fromUserID, toUserID, firstName }) => {
+    socket.on("joinChat", ({ fromUserID, toUserID, fromUserName,toUserName }) => {
       const room = [fromUserID, toUserID].sort().join("_");
-      console.log(`${firstName} joined the ${room}`);
+      console.log(`${fromUserName} joined the ${room}`);
       socket.join(room);
     });
 
