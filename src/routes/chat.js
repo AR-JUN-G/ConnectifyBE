@@ -12,7 +12,7 @@ chatRouter.get("/api/direct/chats", auth, async (req, res) => {
 
     const chatList = await Chat.find({ participants: userID })
       .populate("participants", "_id firstName lastName photourl")
-      .populate("latestMessage","message createdAt")
+      .populate("latestMessage", "message createdAt")
       .sort({ updatedAt: -1 })
       .select("participants latestMessage updatedAt");
 
@@ -23,12 +23,12 @@ chatRouter.get("/api/direct/chats", auth, async (req, res) => {
       );
 
       return {
-        userID:otherUser?._id,
-        firstName:otherUser?.firstName,
-        lastName:otherUser?.lastName,
-        photourl:otherUser?.photourl,
-        latestMessage:chat?.latestMessage?.message || "",
-        time: chat?.latestMessage?.createdAt || chat?.updatedAt
+        userID: otherUser?._id,
+        firstName: otherUser?.firstName,
+        lastName: otherUser?.lastName,
+        photourl: otherUser?.photourl,
+        latestMessage: chat?.latestMessage?.message || "",
+        time: chat?.latestMessage?.createdAt || chat?.updatedAt,
       };
     });
     res.status(200).json({
@@ -101,8 +101,10 @@ chatRouter.get("/api/direct/:receiverID", auth, async (req, res) => {
     let limit = parseInt(req.query.limit) || 10;
     let page = parseInt(req.query.page) || 1;
     let receiverID = req.params.receiverID;
-    let roomID=[req.user._id.toString(),receiverID.toString()].sort().join('_');
-    
+    let roomID = [req.user._id.toString(), receiverID.toString()]
+      .sort()
+      .join("_");
+
     if (limit > 50 || limit == 0) {
       limit = 50;
     }
@@ -120,13 +122,24 @@ chatRouter.get("/api/direct/:receiverID", auth, async (req, res) => {
         .status(403)
         .json({ message: "Unauthorized to view this chat" });
     }
-    let message = await MessageModel.find({ chatId: room._id })
+
+    let messages = await MessageModel.find({ chatId: room._id })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .select("-updatedAt -__v -chatId");
 
+    const totalMessage = await MessageModel.countDocuments({
+      chatId: room._id,
+    });
+
+    const hasMore = totalMessage > skip + messages.length;
     res.status(200).json({
-      data: message,
+      messages,
+      pagination: {
+        currentPage: page,
+        hasMore: hasMore,
+      },
     });
   } catch (error) {
     console.log(error);
