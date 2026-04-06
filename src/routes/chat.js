@@ -77,15 +77,15 @@ chatRouter.get(
         });
       });
       console.log(usersWithExistingChats, "ExistingUser");
+
       const availableFriends = friends.filter((friend) => {
-        if (!usersWithExistingChats.has(friend)) {
-          return friend;
-        }
+        const friendIdString = friend._id.toString();
+        return !usersWithExistingChats.has(friendIdString);
       });
 
       res.status(200).json({
         message: "Available Friends Fetched",
-        data: availableFriends,
+        members: availableFriends,
       });
     } catch (error) {
       console.error(error, "something went wrong");
