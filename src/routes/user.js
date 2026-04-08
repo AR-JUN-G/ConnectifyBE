@@ -14,11 +14,11 @@ userRouter.get("/api/users/request/received", auth, async (req, res) => {
       status: "interested" || "accepted",
     })
       .populate("fromUserID", ["firstName", "lastName", "photourl"])
-      .select("-createdAt -updatedAt -__v");
+      .select("-createdAt -updatedAt -__v -_id -toUserID");
 
     res.status(200).json({
       message: "Data fetched Successfully",
-      data: requestList,
+      requests: requestList,
     });
   } catch (error) {
     console.log(error, "Error Occured while fetching the Connection request");
