@@ -14,7 +14,7 @@ userRouter.get("/api/users/request/received", auth, async (req, res) => {
       status: "interested" || "accepted",
     })
       .populate("fromUserID", ["firstName", "lastName", "photourl"])
-      .select("-createdAt -updatedAt -__v -_id -toUserID");
+      .select("-createdAt -updatedAt -__v -toUserID");
 
     res.status(200).json({
       message: "Data fetched Successfully",
