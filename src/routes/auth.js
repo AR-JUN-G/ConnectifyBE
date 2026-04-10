@@ -10,6 +10,7 @@ const User = require("../models/user");
 const Token = require("../models/token");
 const auth = require("../middleware/auth");
 
+const isProduction = process.env.NODE_ENV === "production";
 authRouter.post("/api/signup", async (req, res) => {
   try {
     const { firstName, lastName, emailId, password } = req.body;
@@ -109,13 +110,13 @@ authRouter.post("/api/login", async (req, res) => {
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 15 * 60 * 1000,
       });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
+        sameSite: isProduction ? "none" : "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -257,14 +258,14 @@ authRouter.get("/api/auth/refresh", async (req, res) => {
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 15 * 60 * 1000, // 15 mins
     });
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "none",
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
