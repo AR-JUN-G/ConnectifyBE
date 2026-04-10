@@ -5,7 +5,7 @@ const MessageModel = require("../models/message");
 const onlineUsers = new Map();
 const allowedOrigins = [
   "http://localhost:1234",
-  "https://developer-network-9ma8-three.vercel.app", // Reminder: No trailing slash!
+  "https://developer-network-9ma8-three.vercel.app", 
 ];
 
 const initializeSocket = (server) => {

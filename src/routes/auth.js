@@ -108,10 +108,14 @@ authRouter.post("/api/login", async (req, res) => {
       );
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        secure: true,
+        sameSite: "none",
         maxAge: 15 * 60 * 1000,
       });
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
+        secure: true,
+        sameSite: "none",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -219,13 +223,21 @@ authRouter.get("/api/auth/refresh", async (req, res) => {
     }
 
     // 4. The Rotation: Generate brand new tokens
-    const newAccessToken = jwt.sign({ userID: userID }, process.env.JWT_SECRET, {
-      expiresIn: "15m",
-    });
+    const newAccessToken = jwt.sign(
+      { userID: userID },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "15m",
+      },
+    );
 
-    const newRefreshToken = jwt.sign({ userID: userID }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const newRefreshToken = jwt.sign(
+      { userID: userID },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
 
     // 5. Update MongoDB: Remove the old token from the array and push the new one
     await Token.updateOne(
@@ -244,11 +256,15 @@ authRouter.get("/api/auth/refresh", async (req, res) => {
     // 6. Set the new HTTP-only cookies
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
       maxAge: 15 * 60 * 1000, // 15 mins
     });
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
