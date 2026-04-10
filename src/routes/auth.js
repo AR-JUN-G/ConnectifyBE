@@ -148,14 +148,19 @@ authRouter.post("/api/auth/logout", auth, async (req, res) => {
     const userID = req.user._id;
     const refreshToken = req.cookies.refreshToken;
 
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: isProduction ? "none" : "lax",
+    };
     await Token.updateOne(
       { userID: userID },
       {
         $pull: { refreshToken: refreshToken },
       },
     );
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
 
     res.status(200).json({ message: "User logged Out Successfully" });
   } catch (error) {
@@ -216,8 +221,8 @@ authRouter.get("/api/auth/refresh", async (req, res) => {
       // This means a hacker might be trying to use a stolen, old token.
       // Best practice: Delete ALL their tokens to secure the account.
       await Token.findOneAndDelete({ userID: userID });
-      res.clearCookie("accessToken");
-      res.clearCookie("refreshToken");
+      res.clearCookie("accessToken",cookieOptions);
+      res.clearCookie("refreshToken",cookieOptions);
       return res
         .status(403)
         .json({ message: "Security breach detected. All sessions revoked." });
