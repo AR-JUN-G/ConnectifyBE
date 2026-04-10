@@ -89,7 +89,7 @@ authRouter.post("/api/login", async (req, res) => {
         {
           userID: getUser._id,
         },
-        "secret",
+        process.env.JWT_SECRET,
         { expiresIn: "15m" },
       );
 
@@ -97,7 +97,7 @@ authRouter.post("/api/login", async (req, res) => {
         {
           userID: getUser._id,
         },
-        "secret",
+        process.env.JWT_SECRET,
         { expiresIn: "7d" },
       );
 
@@ -189,7 +189,7 @@ authRouter.get("/api/auth/refresh", async (req, res) => {
     // 2. Verify the Refresh Token cryptographically
     let decoded;
     try {
-      decoded = jwt.verify(oldRefreshToken, "secret");
+      decoded = jwt.verify(oldRefreshToken, process.env.JWT_SECRET);
     } catch (error) {
       // If the refresh token itself is expired or tampered with
       return res
@@ -219,11 +219,11 @@ authRouter.get("/api/auth/refresh", async (req, res) => {
     }
 
     // 4. The Rotation: Generate brand new tokens
-    const newAccessToken = jwt.sign({ userID: userID }, "secret", {
+    const newAccessToken = jwt.sign({ userID: userID }, process.env.JWT_SECRET, {
       expiresIn: "15m",
     });
 
-    const newRefreshToken = jwt.sign({ userID: userID }, "secret", {
+    const newRefreshToken = jwt.sign({ userID: userID }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 

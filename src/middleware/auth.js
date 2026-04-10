@@ -10,7 +10,7 @@ const auth = async (req, res, next) => {
       });
     }
 
-    const decodePayLoad = jwt.verify(accessToken, "secret");
+    const decodePayLoad = jwt.verify(accessToken, process.env.JWT_SECRET);
     console.log("JWT:",decodePayLoad);
     const user = await User.findById(decodePayLoad.userID).select('-password');
 

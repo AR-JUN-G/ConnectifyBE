@@ -11,12 +11,16 @@ const cors = require("cors");
 const { createServer } = require("http");
 const initializeSocket = require("./utils/socketConnection");
 const chatRouter = require("./routes/chat");
+require('dotenv').config();
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:1234",
+    origin: [
+      "http://localhost:1234",
+      "https://developer-network-9ma8-three.vercel.app",
+    ],
     credentials: true,
   }),
 );
