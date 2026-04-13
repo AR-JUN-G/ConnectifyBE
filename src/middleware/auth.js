@@ -12,7 +12,7 @@ const auth = async (req, res, next) => {
 
     const decodePayLoad = jwt.verify(accessToken, process.env.JWT_SECRET);
     console.log("JWT:",decodePayLoad);
-    const user = await User.findById(decodePayLoad.userID).select('-password');
+    const user = await User.findById(decodePayLoad.userID).select('-password -updatedAt -__v -createdAt');
 
     if (!user) {
       return res.status(401).json({ message: "User no Longer exists" });
