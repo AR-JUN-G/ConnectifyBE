@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
@@ -11,7 +12,6 @@ const cors = require("cors");
 const { createServer } = require("http");
 const initializeSocket = require("./utils/socketConnection");
 const chatRouter = require("./routes/chat");
-require('dotenv').config();
 
 app.use(express.json());
 app.use(cookieParser());
