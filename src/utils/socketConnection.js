@@ -82,7 +82,7 @@ const initializeSocket = (server) => {
 
         if (userSockets.size == 0) {
           onlineUsers.delete(userID);
-          io.emit("getOnlineUsers", Array.from(onlineUsers.keys()));
+          io.emit("getOnlineUser", Array.from(onlineUsers.keys()));
         }
       }
     });
