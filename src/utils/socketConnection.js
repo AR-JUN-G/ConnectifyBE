@@ -74,6 +74,24 @@ const initializeSocket = (server) => {
       });
     });
 
+    socket.on("unsendMessage", async ({ messageId, fromUserID, toUserID }) => {
+      try {
+        const room = [fromUserID, toUserID].sort().join("_");
+        const message = await MessageModel.findById(messageId);
+        
+        // Ensure the message exists and the user requesting the unsend originally sent it
+        if (message && message.senderId.toString() === fromUserID.toString()) {
+          message.unsend = true;
+          await message.save();
+          
+          io.to(room).emit("messageUnsent", messageId);
+          console.log(`Message ${messageId} unsent successfully`);
+        }
+      } catch (error) {
+        console.error("Error unsending message:", error);
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log("Client Disconnected 🥲");
       if (userID && onlineUsers.has(userID)) {

@@ -16,6 +16,10 @@ const messageSchema = new Mongoose.Schema(
       type: String,
       required: true,
     },
+    unsend:{
+      type:Boolean,
+      default:false
+    }
   },
   {
     timestamps: true,
