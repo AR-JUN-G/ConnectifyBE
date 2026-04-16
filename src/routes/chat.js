@@ -16,7 +16,6 @@ chatRouter.get("/api/direct/chats", auth, async (req, res) => {
       .sort({ updatedAt: -1 })
       .select("participants latestMessage updatedAt");
 
-    console.log(chatList);
     let chatMembers = chatList.map((chat) => {
       let otherUser = chat.participants.find(
         (participant) => participant._id.toString() !== userID.toString(),
@@ -123,7 +122,7 @@ chatRouter.get("/api/direct/:receiverID", auth, async (req, res) => {
         .json({ message: "Unauthorized to view this chat" });
     }
 
-    let messages = await MessageModel.find({ chatId: room._id })
+    let messages = await MessageModel.find({ chatId: room._id, unsend: { $ne: true } })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -131,6 +130,7 @@ chatRouter.get("/api/direct/:receiverID", auth, async (req, res) => {
 
     const totalMessage = await MessageModel.countDocuments({
       chatId: room._id,
+      unsend: { $ne: true }
     });
 
     const hasMore = totalMessage > skip + messages.length;
